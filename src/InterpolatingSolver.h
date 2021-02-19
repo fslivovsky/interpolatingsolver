@@ -28,7 +28,7 @@ public:
   boost::tribool getInterpolant(int variable, vector<int>& assumptions, vector<int>& shared_variables, int budget);
   avy::abc::Aig_Man_t * getCircuit(vector<int>& input_variables, bool compress);
   vector<tuple<vector<int>,int>> getDefinitions(vector<int>& input_variables, vector<int>& output_variables, bool compress, int auxiliary_start);
-  vector<tuple<vector<int>,int>> getDefinition(vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start);
+  tuple<vector<tuple<vector<int>,int>>, vector<int>> getDefinition(vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start);
   void interrupt();
 
 private:

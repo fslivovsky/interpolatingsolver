@@ -219,10 +219,12 @@ vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinitions(vector<int>& 
   return definitions;
 }
 
-vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinition(vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start) {
+tuple<vector<tuple<vector<int>,int>>, vector<int>> InterpolatingSolver::getDefinition(vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start) {
   assert(solver.isSolved());
   Aig_Man_t* circuit = solver.getInterpolant(input_variables, std::max<int>(1, input_variables.size()));
   vector<tuple<vector<int>,int>> definitions;
+  vector<bool> input_variables_used_characteristic(input_variables.size());
+  std::fill(input_variables_used_characteristic.begin(), input_variables_used_characteristic.end(), false);
 
   if (circuit != nullptr) {
     // Make sure number of inputs matches expectations
@@ -274,12 +276,16 @@ vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinition(vector<int>& i
     Vec_PtrForEachEntry(Aig_Obj_t *, vNodes, pObj, i) {
       int first_input, second_input, output;
       if (Aig_ObjIsCi(Aig_ObjFanin0(pObj))) {
-        first_input = input_variables[Aig_ObjCioId(Aig_ObjFanin0(pObj))];
+        auto index = Aig_ObjCioId(Aig_ObjFanin0(pObj));
+        input_variables_used_characteristic[index] = true;
+        first_input = input_variables[index];
       } else {
         first_input = Aig_ObjFanin0(pObj)->iData;
       }
       if (Aig_ObjIsCi(Aig_ObjFanin1(pObj))) {
-        second_input = input_variables[Aig_ObjCioId(Aig_ObjFanin1(pObj))];
+        auto index = Aig_ObjCioId(Aig_ObjFanin1(pObj));
+        input_variables_used_characteristic[index] = true;
+        second_input = input_variables[index];
       } else {
         second_input = Aig_ObjFanin1(pObj)->iData;
       }
@@ -301,7 +307,9 @@ vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinition(vector<int>& i
     Aig_ManForEachCo(circuit, pObj, i) {
       int input, output;
       if (Aig_ObjIsCi(Aig_ObjFanin0(pObj))) {
-        input = input_variables[Aig_ObjCioId(Aig_ObjFanin0(pObj))];
+        auto index = Aig_ObjCioId(Aig_ObjFanin0(pObj));
+        input_variables_used_characteristic[index] = true;
+        input = input_variables[index];
       } else {
         input = Aig_ObjFanin0(pObj)->iData;
       }
@@ -317,7 +325,13 @@ vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinition(vector<int>& i
     Aig_ManCleanCioIds(circuit);
     Vec_PtrFree(vNodes);
   }
-  return definitions;
+  vector<int> input_variables_used;
+  for (int i = 0; i < input_variables_used_characteristic.size(); i++) {
+    if (input_variables_used_characteristic[i]) {
+      input_variables_used.push_back(input_variables[i]);
+    }
+  }
+  return std::make_tuple(definitions, input_variables_used);
 }
 
 void InterpolatingSolver::interrupt() {
