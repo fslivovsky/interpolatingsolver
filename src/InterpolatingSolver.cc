@@ -219,7 +219,7 @@ vector<tuple<vector<int>,int>> InterpolatingSolver::getDefinitions(vector<int>& 
   return definitions;
 }
 
-tuple<vector<tuple<vector<int>,int>>, vector<int>> InterpolatingSolver::getDefinition(vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start) {
+tuple<vector<tuple<vector<int>,int>>, vector<int>> InterpolatingSolver::getDefinition(const vector<int>& input_variables, int output_variable, bool compress, int auxiliary_start) {
   assert(solver.isSolved());
   Aig_Man_t* circuit = solver.getInterpolant(input_variables, std::max<int>(1, input_variables.size()));
   vector<tuple<vector<int>,int>> definitions;
