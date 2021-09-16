@@ -22,7 +22,7 @@ public:
   void reserve(int nr_variables);
   void addFormula(clauseSet& first_part, clauseSet& second_part);
   bool addClause(vector<int>& literals, int part=0);
-  bool solve(const vector<int>& assumptions=vector<int>());
+  bool solve(const vector<int>& assumptions=vector<int>(), int limit=-1);
   vector<int> getConflict();
   boost::tribool getVarVal(int variable);
   boost::tribool getInterpolant(int variable, vector<int>& assumptions, vector<int>& shared_variables, int budget);

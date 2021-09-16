@@ -65,8 +65,12 @@ bool InterpolatingSolver::addClause(vector<int>& literals, int part) {
   return solver.addClause(literals);
 }
 
-bool InterpolatingSolver::solve(const vector<int>& assumptions) {
-  return solver.solve(assumptions);
+bool InterpolatingSolver::solve(const vector<int>& assumptions, int limit) {
+  if (limit >= 0) {
+    return solver.solve(assumptions, limit);
+  } else {
+    return solver.solve(assumptions);
+  }
 }
 
 vector<int> InterpolatingSolver::getConflict() {
