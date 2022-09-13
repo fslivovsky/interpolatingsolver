@@ -6,6 +6,12 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     "In-source builds are not allowed. Please clean your source tree and try again.")
 endif()
 
+# check for rt lib. Not needed on OSX.
+find_library(RT_LIB NAMES rt)
+if (NOT RT_LIB)
+  set(RT_LIB "")
+endif()
+mark_as_advanced(RT_LIB)
 
 # Add path for custom modules
 set(CMAKE_MODULE_PATH
